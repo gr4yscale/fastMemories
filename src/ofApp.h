@@ -7,6 +7,8 @@ class ofApp : public ofBaseApp{
     private:
         bool currentFileIndexWithinBounds();
         void updateTexture();
+        void drawGUI();
+        long currentFileIndex();
 
 	public:
 		void setup();
@@ -25,16 +27,16 @@ class ofApp : public ofBaseApp{
     
         // state
         bool paused = 0;
+        bool updatingFrameRate = 0;
         float frameChangeDelta;
-        long currentFileIndex = 0;
-        string currentFileName;
+        double preciseFileIndex = 0;
     
         ofImage img;
         ofTexture texture;
     
         ofDirectory dir;
 		ofTrueTypeFont statusFont;
-    
-    
-    
+        ofTrueTypeFont indexFont;
+ 
+        vector<ofColor> colors;
 };

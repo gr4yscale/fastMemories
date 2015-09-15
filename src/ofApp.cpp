@@ -7,12 +7,21 @@ void ofApp::setup(){
     ofSetFrameRate(60);
     
     statusFont.loadFont("Ubuntu Mono derivative Powerline Bold.ttf", 32);
+    indexFont.loadFont("Ubuntu Mono derivative Powerline Bold.ttf", 200);
     
-    string photosDirectory = "/Volumes/1TB Ext SSD 2/[spazzyvideo]/2014-iPhone";
+    // recurse subdirectories?
+    
+    string photosDirectory = "/Users/gr4yscale/Desktop/[fastMemoriesTest]";
 
     dir.open(photosDirectory);
     dir.allowExt("jpg");
+    dir.allowExt("JPG");
     dir.listDir();
+    
+    // load table of random colors for testing without images
+    for (int i = 0; i < 3000; i++) {
+        colors.push_back(ofColor(ofRandom(255),ofRandom(255), ofRandom(255)));
+    }
 }
 
 //--------------------------------------------------------------
@@ -20,83 +29,96 @@ void ofApp::update(){
     
     if (paused) return;
     
-    if (frameChangeDelta >= 0) {
-        currentFileIndex++;
-    } else {
-        currentFileIndex--;
+    preciseFileIndex += frameChangeDelta;
+    
+    if (preciseFileIndex >= colors.size()) {
+        preciseFileIndex = colors.size();
+    } else if (preciseFileIndex <= 0) {
+        preciseFileIndex = 0;
     }
     
-    if (currentFileIndexWithinBounds()) {
-        currentFileName = dir.getName(currentFileIndex);
-        updateTexture();
-    }
-    
-    ofSetFrameRate(abs(frameChangeDelta));
+    //        updateTexture();
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-    ofPushMatrix();
-        ofTranslate((ofGetWidth() - texture.getWidth()) / 2.0, 0);
-        texture.draw(0, 0);
-    ofPopMatrix();
+    ofColor color = colors[currentFileIndex()];
+    ofBackground(color);
+    drawGUI();
+}
+
+void ofApp::drawGUI() {
+
+    ofSetColor(255, 255, 255, 255);
     
-    statusFont.drawString(currentFileName + ", FPS: " + ofToString(frameChangeDelta), 10, 40);
+//    statusFont.drawString(ofToString(dir.getName(currentFileIndex())), 10, 40);
+    indexFont.drawString(ofToString(currentFileIndex()), ofGetWidth() / 2.0 - 160.0, ofGetHeight() / 2.0);
+    
+    ofSetColor(255, 255, 255, 100);
+    
+    float markerWidth = (400.0 * frameChangeDelta);
+    ofRect(ofGetWidth() / 2.0, ofGetHeight() - 40.0, markerWidth, 20);
 }
 
 void ofApp::updateTexture() {
-    ofLoadImage(texture, dir.getPath(currentFileIndex));
+
+    ofLoadImage(texture, dir.getPath(currentFileIndex()));
 }
 
-bool ofApp::currentFileIndexWithinBounds() {
-    if ((currentFileIndex < dir.numFiles() - 1) &&
-        (currentFileIndex > 0)) return true;
-    return false;
+long ofApp::currentFileIndex() {
+
+    return floor(preciseFileIndex);
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+
     switch (key) {
         case OF_KEY_RIGHT:
-            currentFileIndex++;
+            preciseFileIndex++;
             updateTexture();
             break;
         case OF_KEY_LEFT:
-            currentFileIndex--;
+            preciseFileIndex--;
             updateTexture();
+            break;
+        case ' ':
+            paused = !paused;
+            break;
         case 'p':
             paused = !paused;
+            break;
         default:
             break;
     }
 }
 
 //--------------------------------------------------------------
-void ofApp::keyReleased(int key){
-
-}
-
-//--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-    frameChangeDelta = (x - (ofGetWidth() / 2)) * 0.1;
-//    cout << val << endl;
-}
-
-//--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
 
+    if (updatingFrameRate) {
+        frameChangeDelta = ofMap(x, 0, ofGetWidth(), -1.1, 1.1);
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-    paused = !paused;
+
+    updatingFrameRate = true;
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
 
+    updatingFrameRate = false;
 }
+
+//--------------------------------------------------------------
+void ofApp::mouseMoved(int x, int y ){ }
+
+//--------------------------------------------------------------
+void ofApp::keyReleased(int key){ }
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
