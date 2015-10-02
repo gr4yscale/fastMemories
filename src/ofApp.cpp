@@ -24,15 +24,8 @@ void ofApp::setup(){
     statusFont.loadFont("Ubuntu Mono derivative Powerline Bold.ttf", 32);
     indexFont.loadFont("Ubuntu Mono derivative Powerline Bold.ttf", 200);
     
-    // recurse subphotosDirectories?
-    
-    loadImagesMetadata();
-    
-// load table of random colors for testing without images
-//    for (int i = 0; i < 3000; i++) {
-//        colors.push_back(ofColor(ofRandom(255),ofRandom(255), ofRandom(255)));
-//    }
-
+    loadFilePaths();
+//    loadMetadata();
 }
 
 //--------------------------------------------------------------
@@ -42,13 +35,13 @@ void ofApp::update(){
     
     preciseFileIndex += frameChangeDelta;
     
-    if (preciseFileIndex >= photosDir.size() - 1) {
-        preciseFileIndex = photosDir.size() - 1;
+    if (preciseFileIndex >= fileNames.size() - 1) {
+        preciseFileIndex = fileNames.size() - 1;
     } else if (preciseFileIndex <= 0) {
         preciseFileIndex = 0;
     }
     
-//    updateTexture();
+    updateTexture();
 }
 
 //--------------------------------------------------------------
@@ -71,6 +64,8 @@ void ofApp::loadDirectory(ofDirectory dir) {
     for(int i = 0; i < size; i++) {
         if (dir.getFile(i).isDirectory() == 1) {
             ofDirectory subDir(dir.getFile(i).getAbsolutePath());
+            subDir.allowExt("jpg");
+            subDir.allowExt("JPG");
             loadDirectory(subDir);
         } else {
             fileNames.push_back(dir.getPath(i));
@@ -78,16 +73,22 @@ void ofApp::loadDirectory(ofDirectory dir) {
     }
 }
 
+void ofApp::loadColorsTestData() {
+    // load table of random colors for testing without images
+    for (int i = 0; i < 3000; i++) {
+        colors.push_back(ofColor(ofRandom(255),ofRandom(255), ofRandom(255)));
+    }
+}
 
-void ofApp::loadImagesMetadata() {
+void ofApp::loadFilePaths() {
+    string exportedDir = "/Users/gr4yscale/[fastMemoriesTest]/exported";
+    loadDirectory(exportedDir);
+}
+
+void ofApp::loadMetadata() {
 
     string originalDir = "/Users/gr4yscale/[fastMemoriesTest]/source";
     string exportedDir = "/Users/gr4yscale/[fastMemoriesTest]/exported";
-    
-    photosDir.allowExt("jpg");
-    photosDir.allowExt("JPG");
-
-    loadDirectory(exportedDir);
     
     if(!SXMPMeta::Initialize()){
         ofLogError() << "Could not initialize XMP toolkit!";
@@ -232,7 +233,7 @@ void ofApp::drawGUI() {
 
     ofSetColor(255, 255, 255, 255);
     
-//    statusFont.drawString(ofToString(photosDir.getName(currentFileIndex())), 10, 40);
+//    statusFont.drawString(ofToString(fileNames.getName(currentFileIndex())), 10, 40);
 //    indexFont.drawString(ofToString(currentFileIndex()), ofGetWidth() / 2.0 - 160.0, ofGetHeight() / 2.0);
 //    ofSetColor(255, 255, 255, 100);
     
@@ -242,7 +243,7 @@ void ofApp::drawGUI() {
 
 void ofApp::updateTexture() {
 
-    ofLoadImage(texture, photosDir.getPath(currentFileIndex()));
+    ofLoadImage(texture, fileNames[currentFileIndex()]);
 }
 
 long ofApp::currentFileIndex() {

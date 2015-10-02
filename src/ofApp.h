@@ -32,7 +32,9 @@ class ofApp : public ofBaseApp{
         void loadXMP(string path);
         bool currentFileIndexWithinBounds();
         void updateTexture();
-        void loadImagesMetadata();
+        void loadFilePaths();
+        void loadColorsTestData();
+        void loadMetadata();
         void drawGUI();
         long currentFileIndex();
         void loadXMPTest(const char * fileName);
@@ -61,7 +63,6 @@ class ofApp : public ofBaseApp{
         ofImage img;
         ofTexture texture;
     
-        ofDirectory photosDir;
 		ofTrueTypeFont statusFont;
         ofTrueTypeFont indexFont;
  
