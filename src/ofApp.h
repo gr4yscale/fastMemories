@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ofxSyphon.h"
 
 // Must be defined to instantiate template classes
 #define TXMP_STRING_TYPE std::string
@@ -56,6 +57,7 @@ class ofApp : public ofBaseApp{
     
         // state
         bool paused = 0;
+        bool syphonEnabled = 0;
         bool updatingFrameRate = 0;
         float frameChangeDelta;
         double preciseFileIndex = 0;
@@ -69,4 +71,6 @@ class ofApp : public ofBaseApp{
         vector<ofColor> colors;
         vector<Photo> photos;
         vector<string> fileNames;
+    
+        ofxSyphonServer outputSyphonServer;
 };

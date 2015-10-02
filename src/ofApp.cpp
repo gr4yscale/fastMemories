@@ -21,6 +21,8 @@ void ofApp::setup(){
     ofBackground(0, 0, 0);
     ofSetFrameRate(60);
     
+    outputSyphonServer.setName("fastMemories syphon server");
+    
     statusFont.loadFont("Ubuntu Mono derivative Powerline Bold.ttf", 32);
     indexFont.loadFont("Ubuntu Mono derivative Powerline Bold.ttf", 200);
     
@@ -47,13 +49,14 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 
-//    ofColor color = colors[currentFileIndex()];
-//    ofBackground(color);
-    
-    ofPushMatrix();
-        ofTranslate((ofGetWidth() - texture.getWidth()) / 2.0, 0);
-        texture.draw(0, 0);
-    ofPopMatrix();
+    if (syphonEnabled) {
+        outputSyphonServer.publishTexture(&texture);
+    } else {
+        ofPushMatrix();
+            ofTranslate((ofGetWidth() - texture.getWidth()) / 2.0, 0);
+            texture.draw(0, 0);
+        ofPopMatrix();
+    }
     
     drawGUI();
 }
@@ -81,7 +84,7 @@ void ofApp::loadColorsTestData() {
 }
 
 void ofApp::loadFilePaths() {
-    string exportedDir = "/Users/gr4yscale/[fastMemoriesTest]/exported";
+    string exportedDir = "/Volumes/1TB Ext SSD 2/[spazzyvideo]/2013-iphone";
     loadDirectory(exportedDir);
 }
 
@@ -268,6 +271,9 @@ void ofApp::keyPressed(int key){
             break;
         case 'p':
             paused = !paused;
+            break;
+        case 's':
+            syphonEnabled = !syphonEnabled;
             break;
         default:
             break;
