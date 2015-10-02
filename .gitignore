@@ -1,0 +1,4 @@
+bin/**
+bin
+*.DS_Store
+fastMemories.xcodeproj/project.xcworkspace/xcuserdata/
